@@ -1,0 +1,23 @@
+---
+# tasks file for /etc/ansible/roles/postgresql_role
+- name: Install postgresql-server package
+  yum: name=postgresql-server update_cache=yes
+
+- name: Install php-pgsql package
+  yum: name=php-pgsql update_cache=yes
+
+- name: Install php-pdo_pgsql package
+  yum: name=php-pdo_pgsql update_cache=yes
+
+- name: Initialize the database cluster
+  ansible.builtin.command: /usr/bin/postgresql-setup --initdb
+  become: yes
+  become_user: postgres
+  register: result
+  failed_when: result.rc > 1
+
+- name: Enabling and Starting the service postgresql
+  service:
+    name: postgresql
+    enabled: yes
+    state: started
